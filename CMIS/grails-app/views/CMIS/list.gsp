@@ -69,17 +69,16 @@
 									href="${grailsApplication.config.grails.opencmis.alfresco.atomurl}/content/?id=${file.'cmis:objectId' }">
 										<i class="fa fa-download"></i>
 								</a> ${file.'cmis:name' }</td>
-								<td><a class="btn btn-xs btn-default" href="#"> <i
-										class="fa fa-pencil fa-lg"></i>
-								</a> <a class="btn btn-xs btn-danger" href="#"> <i
-										class="fa fa-trash-o fa-lg"></i>
-								</a></td>
 								<td>
-									${file.'cmis:contentStreamLength' }
+									<a class="btn btn-xs btn-default" href="#">
+										<i class="fa fa-pencil fa-lg"></i>
+									</a>
+									<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#confirmDelete">
+										<i class="fa fa-trash-o fa-lg"></i>
+									</button>
 								</td>
-								<td style="max-width: 150px; text-overflow: ellipsis; overflow:hidden;">
-									${file.'cmis:contentStreamMimeType' }
-								</td>
+								<td>${file.'cmis:contentStreamLength' }</td>
+								<td style="max-width: 150px; text-overflow: ellipsis; overflow:hidden;">${file.'cmis:contentStreamMimeType' }</td>
 							</tr>
 						</g:each>
 					</tbody>
@@ -93,5 +92,20 @@
 
 	<g:render template="addFolderTemplate" />
 	<g:render template="uploadFileTemplate" />
+	
+	<div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+		    	<!-- dialog contents -->
+		    	<div class="modal-body">Are you sure you want to delete this item?</div>
+		    	<!-- dialog buttons -->
+		    	<div class="modal-footer">
+		    		<g:link action="delete" class="btn primary">OK</g:link>
+		    		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		    	</div>
+	    	</div>
+	    </div>
+	</div>
 </body>
 </html>

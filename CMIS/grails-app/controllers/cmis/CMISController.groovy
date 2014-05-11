@@ -34,4 +34,8 @@ class CMISController {
 		CMISService.createDocument(params.Id, uploadedFile)
 		redirect(action: "list", params: [Id: params.Id])
 	}
+	def delete(){
+		CMISService.deleteObject(params.Id)
+		redirect(action: "list", params: [Id: params.parentFolder])
+	}
 }

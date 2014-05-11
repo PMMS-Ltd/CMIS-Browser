@@ -193,4 +193,18 @@ class CMISService {
 		}
 		return out.reverse()
 	}
+	
+	def deleteObject(String objectId){
+		if (!this.session){
+			getSession()
+		}
+		def success = false
+		try {
+			this.session.delete(objectId)
+			success = true
+		}catch(e) {
+			
+		}
+		return success
+	}
 }

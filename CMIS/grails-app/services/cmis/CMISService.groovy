@@ -194,16 +194,17 @@ class CMISService {
 		return out.reverse()
 	}
 	
-	def deleteObject(String objectId){
+	def deleteDocument(String objectId){
 		if (!this.session){
 			getSession()
 		}
 		def success = false
 		try {
-			this.session.delete(objectId)
+			Document doc = (Document) this.session.getObject(objectId)
+			doc.delete()
 			success = true
 		}catch(e) {
-			
+			return success.toString() + e
 		}
 		return success
 	}

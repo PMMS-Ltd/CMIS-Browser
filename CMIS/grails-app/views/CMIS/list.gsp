@@ -63,7 +63,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						<g:each var="file" in="${files}">
+						<g:each var="file" in="${files}" status="i">
+						<div class="modal" id="confirmDelete${i}">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+		    	<!-- dialog contents -->
+		    	<div class="modal-body">
+		    		<i class="fa fa-question-circle fa-4x pull-left" style="color: #d2322d; border-color: #ac2925;"></i>Are you sure you want to delete this item?    	
+		    	</div>
+		    	<!-- dialog buttons -->
+		    	<div class="modal-footer">
+		    		<g:link action="delete" params="[Id: file.'cmis:objectId', folder: folder.'cmis:objectId']" class="btn btn-primary">OK</g:link>
+		    		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		    	</div>
+	    	</div>
+	    </div>
+	</div>
 							<tr>
 								<td><a class="btn btn-xs btn-success"
 									href="${grailsApplication.config.grails.opencmis.alfresco.atomurl}/content/?id=${file.'cmis:objectId' }">
@@ -73,7 +88,7 @@
 									<a class="btn btn-xs btn-default" href="#">
 										<i class="fa fa-pencil fa-lg"></i>
 									</a>
-									<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#confirmDelete">
+									<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#confirmDelete${i}">
 										<i class="fa fa-trash-o fa-lg"></i>
 									</button>
 								</td>
@@ -92,20 +107,5 @@
 
 	<g:render template="addFolderTemplate" />
 	<g:render template="uploadFileTemplate" />
-	
-	<div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog"
-	aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-		    	<!-- dialog contents -->
-		    	<div class="modal-body">Are you sure you want to delete this item?</div>
-		    	<!-- dialog buttons -->
-		    	<div class="modal-footer">
-		    		<g:link action="delete" class="btn primary">OK</g:link>
-		    		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-		    	</div>
-	    	</div>
-	    </div>
-	</div>
 </body>
 </html>

@@ -83,6 +83,7 @@ class CMISService {
 				arr.put('cmis:name',it.name)
 				arr.put('cmis:objectId',it.getId())
 				arr.put('docCount', getQueryResults("select cmis:objectId from cmis:document where in_folder('" + it.getId() +"')").size())
+				arr.put('subfolderCount', getQueryResults("select cmis:objectId from cmis:folder where in_folder('" + it.getId() +"')").size())
 				out.add(arr)
 			}
 		}

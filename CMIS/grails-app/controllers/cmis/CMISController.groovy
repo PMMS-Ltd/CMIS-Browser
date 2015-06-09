@@ -38,4 +38,25 @@ class CMISController {
 		CMISService.deleteDocument(params.Id)
 		redirect(action: "list", params: [Id: params.folder])
 	}
+	def downloadDocument(){
+		def output = CMISService.getDocument(params.documentId)
+		def settings = CMISService.getQueryResults("select cmis:name, cmis:contentStreamMimeType from cmis:document where cmis:objectId='"+params.documentId+"'")
+		def filename = (String)settings.name.toString().substring(1,settings.name.toString().length()-1)
+		if (output) {
+			response.setHeader("Content-disposition", "attachment; filename=" + filename);
+		 response.setContentType(settings.contentStreamMimeType)
+		 response.outputStream << output
+		}
+	}
+	def viewDocument(){
+		def output = CMISService.getDocument(params.id)
+		def settings = CMISService.getQueryResults("select cmis:name, cmis:contentStreamMimeType, cmis:contentStreamLength from cmis:document where cmis:objectId='"+params.id+"'")
+		if (output) {
+			response.setHeader("Content-Disposition", "inline")
+			response.setContentLength(settings['cmis:contentStreamLength'][0]);
+		 response.setContentType(settings['cmis:contentStreamMimeType'][0])
+		 response.outputStream << output
+		 response.outputStream.flush()
+		}
+	}
 }

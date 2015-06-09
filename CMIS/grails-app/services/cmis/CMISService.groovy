@@ -1,6 +1,7 @@
-package cmis
+package uk.org.pmms
 
 import grails.transaction.Transactional
+
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -15,7 +16,7 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.*
-
+import org.apache.chemistry.opencmis.commons.exceptions.*
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 @Transactional
@@ -30,10 +31,14 @@ class CMISService {
 			// default factory implementation
 			SessionFactory factory = SessionFactoryImpl.newInstance();
 			Map<String, String> parameter = new HashMap<String, String>();
-
+			
+			def username = grailsApplication.config.grails.opencmis.alfresco.user
+			def password = grailsApplication.config.grails.opencmis.alfresco.password
+			
 			// user credentials
-			parameter.put(SessionParameter.USER, grailsApplication.config.grails.opencmis.alfresco.user);
-			parameter.put(SessionParameter.PASSWORD, grailsApplication.config.grails.opencmis.alfresco.password);
+			parameter.put(SessionParameter.USER, username);
+			parameter.put(SessionParameter.PASSWORD, password);
+			//parameter.put(SessionParameter.AUTH_HTTP_BASIC, false);
 
 			// connection settings
 			parameter.put(SessionParameter.ATOMPUB_URL, grailsApplication.config.grails.opencmis.alfresco.atomurl); // Uncomment for Atom Pub binding
@@ -89,7 +94,31 @@ class CMISService {
 		}
 		return out;
 	}
-	
+	def getChildDocuments(String folderId) {
+		if (!this.session){
+			getSession()
+		}
+		try{
+			Folder currentFolder = (Folder) this.session.getObject(folderId)
+		def out = []
+		currentFolder.getChildren().each{
+			if (it.getBaseTypeId().value() == 'cmis:document'){
+				def arr = [:]
+				arr.put('name',it.name)
+				arr.put('objectId',it.getId())
+				//arr.put('docCount', getQueryResults("select cmis:objectId from cmis:document where in_folder('" + it.getId() +"')").size())
+				//arr.put('subfolderCount', getQueryResults("select cmis:objectId from cmis:folder where in_folder('" + it.getId() +"')").size())
+				arr.put('contentStreamLength', it.getContentStreamLength())
+				arr.put('description', it.getDescription())
+				arr.put('contentStreamMimeType',it.getContentStreamMimeType())
+				out.add(arr)
+			}
+		}
+		return out;
+		}catch(Exception e){
+			return ""
+		}
+	}
 	def getQueryResults(String queryString, int pageSize = 10, int pageNum = 0) {
 		if (!this.session){
 			getSession()
@@ -99,11 +128,14 @@ class CMISService {
 		
 		results.each { hit ->
 			def emptyArr = [:]
-			hit.properties.each { emptyArr.put(it.queryName,it.firstValue) }
+			hit.properties.each { 
+				emptyArr.put(it.queryName.split(':')[1],it.firstValue)
+				 }
 			
 			out.add(emptyArr)
 		}
 		//return results
+		//System.out.println (out)
 		return out
 		
 	}
@@ -121,9 +153,13 @@ class CMISService {
 		properties.put("cm:description", "My Folder");
 		
 		// create the folder
+		try{
 		Folder newFolder = parent.createFolder(properties);
 		
 		return newFolder.getId()
+		}catch(CmisContentAlreadyExistsException e){
+			return this.getFolderId(folderName)
+		}
 	}
 	def getFolderParent(String folderId){
 		if (!this.session){
@@ -166,13 +202,14 @@ class CMISService {
 		return out
 		
 	}
-	def createDocument (String folderId, CommonsMultipartFile content){
+	def createDocument (String folderId, String description, CommonsMultipartFile content){
 		if (!this.session){
 			getSession()
 		}
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
 		properties.put(PropertyIds.NAME, content.getOriginalFilename());
+		properties.put(PropertyIds.DESCRIPTION, description);
 		
 		InputStream stream = new ByteArrayInputStream(content.getBytes());
 		ContentStream contentStream = this.session.getObjectFactory().createContentStream(content.getOriginalFilename(), content.getSize(), content.getContentType(), stream);
@@ -208,5 +245,39 @@ class CMISService {
 			return success.toString() + e
 		}
 		return success
+	}
+	def getDocument(String documentId){
+		if (!this.session){
+			getSession()
+		}
+		Document doc = (Document) this.session.getObject(documentId)
+		InputStream stream = doc.getContentStream().getStream()
+		return stream
+	}
+	def updateInvoiceProperties(String documentId, params) {
+		if (!this.session){
+			getSession()
+		}
+		
+		
+			Document doc = (Document) session.getObject(documentId);
+			Map<String, String> properties = new HashMap<String, Object>();
+			params.each(){key, value ->
+				System.out.println key+":"+value
+				if (value){
+					if (key == 'pmms:invoiceTotal')
+						properties.put(key, value.toDouble());
+					if (key == 'pmms:invoiceVAT')
+						properties.put(key, value.toDouble());
+					if (key == 'pmms:supplierName')
+						properties.put(key, value);
+					if (key == 'pmms:jobNo')
+						properties.put(key, value.toInteger());
+				}
+			}
+			//System.out.println properties
+			doc.updateProperties(properties, true);
+			return true
+		
 	}
 }

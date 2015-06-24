@@ -53,10 +53,26 @@ class CMISController {
 		def settings = CMISService.getQueryResults("select cmis:name, cmis:contentStreamMimeType, cmis:contentStreamLength from cmis:document where cmis:objectId='"+params.id+"'")
 		if (output) {
 			response.setHeader("Content-Disposition", "inline")
-			response.setContentLength(settings['cmis:contentStreamLength'][0]);
-		 response.setContentType(settings['cmis:contentStreamMimeType'][0])
+			response.setContentLength(settings['contentStreamLength'][0]);
+		 response.setContentType(settings['contentStreamMimeType'][0])
 		 response.outputStream << output
 		 response.outputStream.flush()
 		}
+	}
+	def query() {
+		params.max ? params.max : 25
+		params.offset ? params.offset : 0
+		//render request.JSON?.q
+		//def query = request.JSON?.q
+		def query = params.q
+		render CMISService.getQueryResults(query, 50, 0) as JSON
+	}
+	def getImageMetadata() {
+		def query = "select cmis:description, cmis:versionSeriesId, cmis:name from cmis:document where cmis:contentStreamMimeType='image/jpeg' and in_folder('" + params.folder + "')"
+		def imageList = CMISService.getQueryResults(query)
+		imageList.each(){
+			it['url'] = 'http://localhost:8080/CMIS/CMIS/viewDocument/' + it.versionSeriesId			
+		}
+		render imageList as JSON
 	}
 }

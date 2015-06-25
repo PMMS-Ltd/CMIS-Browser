@@ -70,7 +70,7 @@ class CMISController {
 	}
 	def getImageMetadata() {
 		def query = "select cmis:description, cmis:versionSeriesId, cmis:name from cmis:document where cmis:contentStreamMimeType='image/jpeg' and in_folder('" + params.id + "')"
-		def imageList = CMISService.getQueryResults(query)
+		def imageList = CMISService.getQueryResults(query,200,0)
 		imageList.each(){
 			it['url'] = '' + grailsApplication.config.grails.serverURL + '/CMIS/viewDocument/' + it.versionSeriesId	
 		}

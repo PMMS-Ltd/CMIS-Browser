@@ -99,7 +99,7 @@ environments {
 		grails.serverURL ="http://localhost:8080/CMIS"
     }
 	UAT {
-		grails.serverURL ="http://uat.pmms.org.uk/CMIS"
+		grails.serverURL ="http://192.168.0.35:8090/CMIS"
 	}
     production {
         grails.logging.jul.usebridge = false
@@ -131,10 +131,8 @@ log4j = {
 
 grails.opencmis.alfresco.scope='-default-'
 grails.opencmis.alfresco.apiurl='http://alfresco.pmms.org.uk/alfresco'
-//grails.opencmis.alfresco.apiurl='http://192.168.0.15/alfresco'
 grails.opencmis.alfresco.cmisurl='cmis/versions/1.1/atom'
-grails.opencmis.alfresco.atomurl='http://alfresco.pmms.org.uk/alfresco/api/-default-/public/cmis/versions/1.1/atom'
-//grails.opencmis.alfresco.atomurl='http://192.168.0.15/alfresco/api/-default-/public/cmis/versions/1.1/atom'
+grails.opencmis.alfresco.atomurl='http://' + System.env['ALF_HOST'] + '/alfresco/api/-default-/public/cmis/versions/1.1/atom'
 grails.opencmis.alfresco.user='user'
 grails.opencmis.alfresco.password='bitnami'
 

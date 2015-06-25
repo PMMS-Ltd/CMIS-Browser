@@ -45,6 +45,10 @@ grails.views.default.codec = "html"
 // If unspecified, controllers are prototype scoped.
 grails.controllers.defaultScope = 'singleton'
 
+//X-Frame Options Tag
+grails.plugin.xframeoptions.sameOrigin = false
+grails.plugin.xframeoptions.deny = false
+grails.plugin.xframeoptions.allowFrom = '*.pmms.org.uk'
 // GSP settings
 grails {
     views {
@@ -92,10 +96,15 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+		grails.serverURL ="http://localhost:8080/CMIS"
     }
+	UAT {
+		grails.serverURL ="http://uat.pmms.org.uk/CMIS"
+	}
     production {
         grails.logging.jul.usebridge = false
         // TODO: grails.serverURL = "http://www.changeme.com"
+		grails.serverURL = "http://apps.pmms.org.uk/CMIS"
     }
 }
 
@@ -120,10 +129,12 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
-grails.opencmis.alfresco.scope='-default-' 
-grails.opencmis.alfresco.apiurl='http://192.168.0.15/alfresco' 
+grails.opencmis.alfresco.scope='-default-'
+grails.opencmis.alfresco.apiurl='http://alfresco.pmms.org.uk/alfresco'
+//grails.opencmis.alfresco.apiurl='http://192.168.0.15/alfresco'
 grails.opencmis.alfresco.cmisurl='cmis/versions/1.1/atom'
-grails.opencmis.alfresco.atomurl='http://192.168.0.15/alfresco/api/-default-/public/cmis/versions/1.1/atom'
+grails.opencmis.alfresco.atomurl='http://alfresco.pmms.org.uk/alfresco/api/-default-/public/cmis/versions/1.1/atom'
+//grails.opencmis.alfresco.atomurl='http://192.168.0.15/alfresco/api/-default-/public/cmis/versions/1.1/atom'
 grails.opencmis.alfresco.user='user'
 grails.opencmis.alfresco.password='bitnami'
 

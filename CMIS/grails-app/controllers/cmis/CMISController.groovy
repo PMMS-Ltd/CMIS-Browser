@@ -5,7 +5,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 class CMISController {
 	def CMISService
-    
+    def grailsApplication
+	
 	def index() {
 		redirect(action: "list")
 	}
@@ -32,7 +33,7 @@ class CMISController {
 		def CommonsMultipartFile uploadedFile = params.myFile
 				
 		CMISService.createDocument(params.Id, uploadedFile)
-		redirect(action: "list", params: [Id: params.Id])
+		redirect(action: "list", params: [Id: params.Id])810
 	}
 	def deleteDocument(){
 		CMISService.deleteDocument(params.Id)
@@ -68,10 +69,10 @@ class CMISController {
 		render CMISService.getQueryResults(query, 50, 0) as JSON
 	}
 	def getImageMetadata() {
-		def query = "select cmis:description, cmis:versionSeriesId, cmis:name from cmis:document where cmis:contentStreamMimeType='image/jpeg' and in_folder('" + params.folder + "')"
+		def query = "select cmis:description, cmis:versionSeriesId, cmis:name from cmis:document where cmis:contentStreamMimeType='image/jpeg' and in_folder('" + params.id + "')"
 		def imageList = CMISService.getQueryResults(query)
 		imageList.each(){
-			it['url'] = 'http://localhost:8080/CMIS/CMIS/viewDocument/' + it.versionSeriesId			
+			it['url'] = '' + grailsApplication.config.grails.serverURL + '/CMIS/viewDocument/' + it.versionSeriesId	
 		}
 		render imageList as JSON
 	}

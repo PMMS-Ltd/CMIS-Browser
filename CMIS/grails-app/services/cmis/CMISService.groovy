@@ -1,4 +1,4 @@
-package uk.org.pmms
+package cmis
 
 import grails.transaction.Transactional
 
@@ -6,7 +6,9 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.OperationContext
 import org.apache.chemistry.opencmis.client.api.QueryResult;
+import org.apache.chemistry.opencmis.client.api.Rendition
 import org.apache.chemistry.opencmis.client.api.Repository;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
@@ -278,6 +280,16 @@ class CMISService {
 			//System.out.println properties
 			doc.updateProperties(properties, true);
 			return true
-		
+	}
+	def getPreviewImage(String documentId){
+		if (!this.session){
+			getSession()
+		}
+		OperationContext oc = this.session.createOperationContext();
+		oc.setRenditionFilterString("alf:webpreview");
+		List<Rendition> renditions=session.getObject(documentId,oc).getRenditions();
+		//return renditions[0]['streamId'];
+		InputStream stream = renditions[0].getContentStream().getStream()
+		return stream
 	}
 }

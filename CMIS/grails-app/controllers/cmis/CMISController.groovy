@@ -72,8 +72,19 @@ class CMISController {
 		def query = "select cmis:description, cmis:versionSeriesId, cmis:name from cmis:document where cmis:contentStreamMimeType='image/jpeg' and in_folder('" + params.id + "')"
 		def imageList = CMISService.getQueryResults(query,200,0)
 		imageList.each(){
-			it['url'] = '' + grailsApplication.config.grails.serverURL + '/CMIS/viewDocument/' + it.versionSeriesId	
+			it['url'] = '' + grailsApplication.config.grails.serverURL + '/CMIS/getPreviewImage/' + it.versionSeriesId	
 		}
-		render imageList as JSON
+		//render imageList as JSON
+		request.withFormat{
+			'*'{respond imageList}
+		}
+	}
+	def getPreviewImage(){
+		def output = CMISService.getPreviewImage(params.id)
+		if (output){
+			response.setHeader("Content-Disposition", "inline")
+			response.outputStream << output
+			//response.outputStream.flush()
+		}
 	}
 }
